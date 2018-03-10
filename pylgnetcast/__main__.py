@@ -1,6 +1,4 @@
-"""
-Simple command line tool to control a LG NetCast TV.
-"""
+"""Simple command line tool to control a LG NetCast TV."""
 import argparse
 import logging
 import sys
@@ -14,7 +12,7 @@ _LOGGER = logging.getLogger(__name__)
 def main():
     """Process command line and send commands to TV."""
     parser = argparse.ArgumentParser(prog='pylgnetcast',
-                        description='Remote control for a LG NetCast TV.')
+                                     description='Remote control for a LG NetCast TV.')
     parser.add_argument('--host', metavar='host', type=str, required=True,
                         help='Address of the TV')
     parser.add_argument('--pairing_key', metavar='pairing_key', type=str,

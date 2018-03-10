@@ -31,6 +31,7 @@ DEFAULT_TIMEOUT = 3
 
 class LG_COMMAND(object):
     """LG TV remote control commands."""
+
     POWER = 1
     NUMBER_0 = 2
     NUMBER_1 = 3
@@ -97,8 +98,96 @@ class LG_COMMAND(object):
     APPS = 417
 
 
+class LG_COMMAND_2011(object):
+    """LG TV remote control commands."""
+
+    STATUS_BAR = 35
+    QUICK_MENU = 69
+    HOME_MENU = 67
+    PREMIUM_MENU = 89
+    INSTALLATION_MENU = 207
+    FACTORY_ADVANCED_MENU1 = 251
+    FACTORY_ADVANCED_MENU2 = 255
+    POWER_OFF = 8
+    SLEEP_TIMER = 14
+    LEFT = 7
+    RIGHT = 6
+    UP = 64
+    DOWN = 65
+    SELECT_CMD = 68
+    BACK = 40
+    EXIT_CMD = 91
+    RED = 114
+    GREEN = 113
+    YELLOW = 99
+    BLUE = 97
+    ZERO = 16
+    ONE = 17
+    TWO = 18
+    THREE = 19
+    FOUR = 20
+    FIVE = 21
+    SIX = 22
+    SEVEN = 23
+    EIGHT = 24
+    NINE = 25
+    UNDERSCORE = 76
+    PLAY = 176
+    PAUSE = 186
+    FAST_FORWARD = 142
+    REWIND = 143
+    STOP = 177
+    RECORD = 189
+    TV_RADIO = 15
+    SIMPLINK = 126
+    INPUT = 11
+    COMPONENT_RGB_HDMI = 152
+    COMPONENT = 191
+    RGB = 213
+    HDMI = 198
+    HDMI1 = 206
+    HDMI2 = 204
+    HDMI3 = 233
+    HDMI4 = 218
+    AV1 = 90
+    AV2 = 208
+    AV3 = 209
+    USB = 124
+    SLIDESHOW_USB1 = 238
+    SLIDESHOW_USB2 = 168
+    CHANNEL_UP = 0
+    CHANNEL_DOWN = 1
+    CHANNEL_BACK = 26
+    FAVORITES = 30
+    TELETEXT = 32
+    T_OPT = 33
+    CHANNEL_LIST = 83
+    GREYED_OUT_ADD_BUTTON = 85
+    GUIDE = 169
+    INFO = 170
+    LIVE_TV = 158
+    AV_MODE = 48
+    PICTURE_MODE = 77
+    RATIO = 121
+    RATIO_4_3 = 118
+    RATIO_16_9 = 119
+    ENERGY_SAVING = 149
+    CINEMA_ZOOM = 175
+    THREE_D = 220
+    FACTORY_PICTURE_CHECK = 252
+    VOLUME_UP = 2
+    VOLUME_DOWN = 3
+    MUTE = 9
+    AUDIO_LANGUAGE = 10
+    SOUND_MODE = 82
+    FACTORY_SOUND_CHECK = 253
+    SUBTITLE_LANGUAGE = 57
+    AUDIO_DESCRIPTION = 145
+
+
 class LG_QUERY(object):
     """LG TV data queries."""
+
     CUR_CHANNEL = 'cur_channel'
     CHANNEL_LIST = 'channel_list'
     CONTEXT_UI = 'context_ui'
@@ -109,6 +198,7 @@ class LG_QUERY(object):
 
 class LG_PROTOCOL(object):
     """Supported LG TV protcols."""
+
     HDCP = 'hdcp'
     ROAP = 'roap'
 
@@ -187,15 +277,22 @@ class LgNetCastClient(object):
 
     def _send_to_tv(self, message_type, message=None, payload=None):
         """Send message of given type to the tv."""
-        if message_type != 'command' and self.protocol == LG_PROTOCOL.HDCP:
-            message_type = 'dtv_wifirc'
-        url = '%s%s' % (self.url, message_type)
+        if self.protocol == LG_PROTOCOL.HDCP:
+            if message_type == 'auth':
+                message_type = 'auth'
+            else:
+                message_type = 'dtv_wifirc'
         if message:
+            url = '%s%s' % (self.url, message_type)
+            print("POST %s to %s" % (message, url))
             response = requests.post(url, data=message, headers=self.HEADER,
                                      timeout=DEFAULT_TIMEOUT)
         else:
+            url = '%sdata?target=%s&session=%s' % (self.url, payload["target"], self._session)
+            print("GET %s from %s" % (payload["target"], url))
             response = requests.get(url, params=payload, headers=self.HEADER,
                                     timeout=DEFAULT_TIMEOUT)
+        print("Received: %s" % response.text)
         return response
 
 
